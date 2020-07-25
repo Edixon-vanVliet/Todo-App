@@ -1,4 +1,13 @@
 const { body } = require("express-validator");
+const User = require("../../models/User.model");
+
+const exists = (value, { path }) => {
+    return User.findOne({ [path]: value }).then((user) => {
+        if (user) {
+            return Promise.reject("Already in use");
+        }
+    });
+};
 
 exports.validateCreateUserFields = [
     body("firstName")
@@ -23,7 +32,8 @@ exports.validateCreateUserFields = [
         .withMessage("Invalid characters")
         .isLength({ min: 6 })
         .withMessage("Username should have minimum 6 characters.")
-        .trim(),
+        .trim()
+        .custom(exists),
     body("email")
         .not()
         .isEmpty()
@@ -32,7 +42,8 @@ exports.validateCreateUserFields = [
         .withMessage("Email should have between 6 and 255 characters.")
         .isEmail()
         .withMessage("Invalid email.")
-        .normalizeEmail(),
+        .normalizeEmail()
+        .custom(exists),
     body("password")
         .not()
         .isEmpty()
