@@ -8,9 +8,13 @@ require("dotenv/config");
 
 var app = express();
 
+var user = require("./routes/User");
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use("/api/account", user);
 
 mongoose.connect(
     process.env.DB_Connection,
