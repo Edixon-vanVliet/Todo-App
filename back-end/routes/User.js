@@ -6,7 +6,7 @@ const { validateCreateUserFields } = require("../validators/users/createUsers");
 const { addUser } = require("../controllers/User");
 
 Router.post(
-    "/",
+    "/register",
     upload.single("photo"),
     validation(validateCreateUserFields),
     addUser
