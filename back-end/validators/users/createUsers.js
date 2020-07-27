@@ -1,12 +1,11 @@
 const { body } = require("express-validator");
 const User = require("../../models/User.model");
 
-const exists = (value, { path }) => {
-    return User.findOne({ [path]: value }).then((user) => {
-        if (user) {
-            return Promise.reject("Already in use");
-        }
-    });
+const exists = async (value, { path }) => {
+    const user = await User.findOne({ [path]: value });
+    if (user) {
+        return Promise.reject("Already in use");
+    }
 };
 
 exports.validateCreateUserFields = [
