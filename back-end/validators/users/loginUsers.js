@@ -2,18 +2,15 @@ const { body } = require("express-validator");
 const User = require("../../models/User.model");
 const { compare } = require("bcryptjs");
 
-let password = "";
+const authenticateUser = async (value, { req }) => {
+    const { userName } = req.body;
 
-const exists = async (value, { path }) => {
-    const user = await User.findOne({ [path]: value });
+    const user = await User.findOne({ userName });
     if (!user) {
         return Promise.reject("Incorrect credentials");
     }
-    password = user.password;
-};
 
-const validatePassword = async (value) => {
-    const validPassword = await compare(value, password);
+    const validPassword = await compare(value, user.password);
     if (!validPassword) {
         return Promise.reject("Incorrect credentials");
     }
@@ -28,8 +25,7 @@ exports.validateLoginUserFields = [
         .withMessage("Invalid characters")
         .isLength({ min: 6 })
         .withMessage("Username should have minimum 6 characters.")
-        .trim()
-        .custom(exists),
+        .trim(),
     body("password")
         .not()
         .isEmpty()
@@ -38,5 +34,5 @@ exports.validateLoginUserFields = [
         .withMessage("Invalid characters")
         .isLength({ min: 8, max: 25 })
         .withMessage("Password should have between 8 and 25 characters.")
-        .custom(validatePassword),
+        .custom(authenticateUser),
 ];
