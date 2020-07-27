@@ -1,4 +1,12 @@
 const { body } = require("express-validator");
+const User = require("../../models/User.model");
+
+const exists = async (value, { path }) => {
+    const user = await User.findOne({ [path]: value });
+    if (!user) {
+        return Promise.reject("Incorrect credentials");
+    }
+};
 
 exports.validateLoginUserFields = [
     body("userName")
@@ -9,7 +17,8 @@ exports.validateLoginUserFields = [
         .withMessage("Invalid characters")
         .isLength({ min: 6 })
         .withMessage("Username should have minimum 6 characters.")
-        .trim(),
+        .trim()
+        .custom(exists),
     body("password")
         .not()
         .isEmpty()
